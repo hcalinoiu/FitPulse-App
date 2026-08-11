@@ -1,0 +1,13 @@
+dist/
+node_modules/
+.DS_Store
+
+.env
+.env.*
+!.env.example
+
+.supabase/
+supabase/.temp/
+supabase/.branches/
+
+*.log
