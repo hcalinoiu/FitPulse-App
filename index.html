@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111311" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="FitPulse" />
+    <title>FitPulse</title>
+    <link rel="manifest" href="./manifest.webmanifest?v=64" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon-fp.png?v=64" />
+    <link rel="icon" type="image/svg+xml" href="./assets/icon.svg?v=64" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-fp-32.png?v=64" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-fp-192.png?v=64" />
+    <link rel="shortcut icon" type="image/png" href="./assets/favicon-fp-32.png?v=64" />
+    <link rel="stylesheet" href="./styles.css?v=64" />
+  </head>
+  <body>
+    <div id="splash" class="splash" aria-hidden="true">
+      <div class="splash-loader">
+        <div class="loader-orbit">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
+    <main id="app" class="app-shell hidden">
+      <section id="authScreen" class="auth-screen hidden">
+        <div class="auth-hero">
+          <div class="brand-mark">
+            <img class="brand-logo" src="./assets/fitpulse-logo-fp.png?v=64" alt="FitPulse" />
+          </div>
+          <div>
+            <p class="eyebrow">FitPulse</p>
+            <h1>Bun venit pe FitPulse</h1>
+          </div>
+        </div>
+
+        <div id="authSwitch" class="auth-switch" aria-label="Alege autentificarea">
+          <button class="auth-mode active" data-auth-mode="login" type="button">Login</button>
+          <button class="auth-mode" data-auth-mode="signup" type="button">Sign up</button>
+        </div>
+
+        <form id="authForm" class="auth-form">
+          <label id="nameField">
+            Nume
+            <input id="nameInput" type="text" autocomplete="name" placeholder="Numele tau" required />
+          </label>
+          <label>
+            Email
+            <input id="emailInput" type="email" autocomplete="email" placeholder="nume@email.com" required />
+          </label>
+          <label>
+            Parola
+            <span class="password-field">
+              <input id="passwordInput" type="password" autocomplete="current-password" placeholder="Minimum 6 caractere" minlength="6" required />
+              <button class="password-toggle" data-password-target="passwordInput" type="button" aria-label="Arata parola" aria-pressed="false">Arata</button>
+            </span>
+          </label>
+          <button id="authSubmitButton" class="primary-button" type="submit">Login</button>
+          <button id="forgotPasswordButton" class="auth-link-button" type="button">Ai uitat parola?</button>
+        </form>
+
+        <form id="resetForm" class="auth-form reset-form hidden">
+          <div class="reset-head">
+            <h3>Resetare parola</h3>
+            <span>alege metoda</span>
+          </div>
+          <div class="reset-methods" aria-label="Metoda resetare parola">
+            <button class="reset-method active" data-reset-method="email" type="button">Email</button>
+            <button class="reset-method" data-reset-method="phone" type="button">Telefon</button>
+          </div>
+          <label id="resetEmailField">
+            Adresa email
+            <input id="resetEmailInput" type="email" autocomplete="email" placeholder="nume@email.com" />
+          </label>
+          <label id="resetPhoneField" class="hidden">
+            Numar telefon
+            <input id="resetPhoneInput" type="tel" autocomplete="tel" placeholder="+407..." />
+          </label>
+          <label id="resetCodeField" class="hidden">
+            Cod SMS
+            <input id="resetCodeInput" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" />
+          </label>
+          <label id="resetPhonePasswordField" class="hidden">
+            Parola noua
+            <span class="password-field">
+              <input id="resetPhonePasswordInput" type="password" autocomplete="new-password" placeholder="Minimum 6 caractere" minlength="6" />
+              <button class="password-toggle" data-password-target="resetPhonePasswordInput" type="button" aria-label="Arata parola noua" aria-pressed="false">Arata</button>
+            </span>
+          </label>
+          <button id="resetSubmitButton" class="primary-button" type="submit">Trimite link</button>
+          <button id="backToLoginButton" class="auth-link-button" type="button">Inapoi la login</button>
+        </form>
+
+        <form id="newPasswordForm" class="auth-form reset-form hidden">
+          <div class="reset-head">
+            <h3>Parola noua</h3>
+            <span>cont verificat</span>
+          </div>
+          <label>
+            Parola noua
+            <span class="password-field">
+              <input id="newPasswordInput" type="password" autocomplete="new-password" placeholder="Minimum 6 caractere" minlength="6" required />
+              <button class="password-toggle" data-password-target="newPasswordInput" type="button" aria-label="Arata parola noua" aria-pressed="false">Arata</button>
+            </span>
+          </label>
+          <button id="newPasswordSubmitButton" class="primary-button" type="submit">Salveaza parola</button>
+        </form>
+        <div id="authStatus" class="auth-status hidden" role="status"></div>
+
+        <div id="authDivider" class="auth-divider"><span>sau</span></div>
+        <button id="googleAuthButton" class="google-button" type="button">
+          <span>G</span>
+          Continua cu Google
+        </button>
+        <p id="authSyncNote" class="auth-sync-note">Datele se sincronizeaza intre device-uri prin Supabase.</p>
+      </section>
+
+      <section id="mainScreen" class="main-screen hidden">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">FitPulse</p>
+            <h2 id="screenTitle">Acasa</h2>
+          </div>
+          <div class="topbar-credit">
+            <span>developed by</span>
+            <strong>Vaultix.tech</strong>
+            <button id="installButton" class="icon-button hidden" type="button" aria-label="Instaleaza aplicatia">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div id="homeView" class="view active">
+          <section class="hero-band">
+            <div>
+              <p class="eyebrow">Bun venit</p>
+              <h1 id="welcomeName">Bun venit!</h1>
+            </div>
+            <div class="streak-tile">
+              <span id="streakCount">0</span>
+              <small>zile bifate</small>
+            </div>
+          </section>
+
+          <section id="homeWeekCard" class="section-block home-week-card">
+            <div class="section-head">
+              <h3>Saptamana ta</h3>
+            </div>
+            <div id="miniCalendar" class="mini-calendar"></div>
+            <div id="todayWorkout" class="today-workout"></div>
+          </section>
+
+          <section class="section-block hydration-card">
+            <div class="section-head">
+              <h3>Hidratare</h3>
+              <button id="editHydrationButton" class="text-button" type="button">Editeaza</button>
+            </div>
+            <div class="hydration-main">
+              <span id="hydrationAmount">0 ml / 2.500 ml</span>
+              <strong id="hydrationPercent">0%</strong>
+            </div>
+            <div class="progress-line"><span id="hydrationBar"></span></div>
+            <p id="hydrationRemaining" class="compact-note">Mai ai 2.500 ml pana la obiectiv.</p>
+            <div class="quick-actions">
+              <button class="secondary-button hydration-add" data-water="250" type="button">+250 ml</button>
+              <button class="secondary-button hydration-add" data-water="500" type="button">+500 ml</button>
+              <button id="customHydrationButton" class="secondary-button" type="button">Alta cantitate</button>
+            </div>
+          </section>
+
+          <section class="section-block streak-card">
+            <div class="section-head">
+              <h3>Seria ta</h3>
+              <span id="bestStreakLabel" class="soft-label">Record personal: 0</span>
+            </div>
+            <div class="metric-row">
+              <strong id="currentStreakValue">0</strong>
+              <span>antrenamente respectate consecutiv</span>
+            </div>
+            <div class="progress-line"><span id="streakBar"></span></div>
+            <p id="streakNextLabel" class="compact-note">Urmatorul prag: 3</p>
+          </section>
+
+          <section class="section-block challenge-card">
+            <div class="section-head">
+              <h3 id="challengeTitle">Provocare activa</h3>
+              <button id="challengeButton" class="text-button" type="button">Alege provocarea</button>
+            </div>
+            <p id="challengeDescription" class="compact-note">Alege un obiectiv si urmareste-ti progresul.</p>
+            <div class="progress-line"><span id="challengeBar"></span></div>
+            <div id="challengeMeta" class="summary-pills"></div>
+          </section>
+
+          <section class="section-block achievement-card">
+            <div class="section-head">
+              <h3 id="achievementTitle">Ultima realizare</h3>
+              <button id="achievementsButton" class="text-button" type="button">Vezi realizarile</button>
+            </div>
+            <p id="achievementSummary" class="compact-note">Realizarile se deblocheaza automat pe masura ce te antrenezi.</p>
+          </section>
+        </div>
+
+        <div id="trainingView" class="view">
+          <section class="section-block">
+            <div class="calendar-toolbar">
+              <button id="prevMonth" class="icon-button" type="button" aria-label="Luna anterioara">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+              </button>
+              <h3 id="monthLabel"></h3>
+              <button id="nextMonth" class="icon-button" type="button" aria-label="Luna urmatoare">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+              </button>
+            </div>
+            <div id="bigCalendar" class="big-calendar"></div>
+            <div class="calendar-legend">
+              <span><i class="legend-dot done"></i>Finalizat</span>
+              <span><i class="legend-dot planned"></i>Planificat</span>
+              <span><i class="legend-dot empty"></i>Fara antrenament</span>
+            </div>
+            <div class="training-summary">
+              <div class="history-panel">
+                <div class="summary-title">
+                  <span>Istoric</span>
+                  <small>zile si antrenamente</small>
+                </div>
+                <div id="workoutHistory" class="workout-history"></div>
+              </div>
+              <div class="checked-total">
+                <small>Zile bifate in total</small>
+                <strong id="trainingCompletedTotal">0</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-block">
+            <div class="section-head">
+              <h3 id="selectedDateLabel">Zi selectata</h3>
+            </div>
+            <form id="workoutForm" class="workout-form">
+              <label>
+                Grupa / focus
+                <select id="focusInput">
+                  <option value="Piept si triceps">Piept si triceps</option>
+                  <option value="Spate si biceps">Spate si biceps</option>
+                  <option value="Picioare">Picioare</option>
+                  <option value="Fesieri">Fesieri</option>
+                  <option value="Umeri si abdomen">Umeri si abdomen</option>
+                  <option value="Full body">Full body</option>
+                  <option value="Plan generat din sala">Plan generat din sala</option>
+                </select>
+              </label>
+              <label>
+                Exercitii
+                <textarea id="exerciseInput" rows="5" placeholder="Impins la piept 4x8&#10;Flotari la paralele 3x10"></textarea>
+              </label>
+              <button id="workoutSubmitButton" class="primary-button" type="submit">Genereaza ziua</button>
+            </form>
+          </section>
+
+          <section id="activeWorkoutCard" class="section-block active-workout-card">
+            <div class="section-head">
+              <h3>Antrenament activ</h3>
+              <button id="startWorkoutButton" class="secondary-button" type="button">Porneste</button>
+            </div>
+            <div id="activeWorkoutSummary" class="compact-note">Porneste ziua selectata ca sa notezi seturi, pauze si recorduri.</div>
+            <div id="activeWorkoutBody" class="active-workout-body"></div>
+            <button id="finishWorkoutButton" class="primary-button finish-workout-button hidden" type="button">Finalizare antrenament</button>
+            <div id="restTimerBar" class="rest-timer hidden">
+              <span>Pauza</span>
+              <strong id="restTimerValue">00:00</strong>
+              <button id="addRestButton" class="text-button" type="button">+30 sec</button>
+              <button id="pauseRestButton" class="text-button" type="button">Pauza</button>
+              <button id="skipRestButton" class="text-button" type="button">Sari</button>
+            </div>
+          </section>
+        </div>
+
+        <div id="progressView" class="view">
+          <section class="stats-grid">
+            <div class="stat-box">
+              <span id="statCompleted">0</span>
+              <small>Antrenamente</small>
+            </div>
+            <div class="stat-box">
+              <span id="statVolume">0 kg</span>
+              <small>Volum total</small>
+            </div>
+            <div class="stat-box">
+              <span id="statRecords">0</span>
+              <small>Recorduri personale</small>
+            </div>
+          </section>
+
+          <section class="section-block">
+            <div class="section-head">
+              <h3>Frecventa antrenamentelor</h3>
+              <div class="progress-range-control" aria-label="Interval progres">
+                <button class="range-mode active" data-progress-mode="30" type="button">30 zile</button>
+                <button class="range-mode" data-progress-mode="year" type="button">1 an</button>
+              </div>
+            </div>
+            <span id="progressRange" class="soft-label">Ultimele 30 de zile</span>
+            <div class="chart-area">
+              <canvas id="progressChart" width="680" height="360"></canvas>
+              <div id="chartTooltip" class="chart-tooltip hidden"></div>
+            </div>
+          </section>
+
+          <section class="section-block volume-card">
+            <div class="section-head">
+              <h3>Volum ridicat</h3>
+              <select id="volumeFilter" class="hidden" aria-hidden="true" tabindex="-1">
+                <option value="total">Total</option>
+                <option value="group">Grupa musculara</option>
+                <option value="exercise">Exercitiu</option>
+              </select>
+            </div>
+            <div id="volumeSummary" class="volume-summary"></div>
+          </section>
+
+          <section class="section-block muscle-map-card">
+            <div class="section-head">
+              <h3>Harta musculara</h3>
+              <div class="segmented-mini">
+                <button class="muscle-view active" data-muscle-view="front" type="button">Fata</button>
+                <button class="muscle-view" data-muscle-view="back" type="button">Spate</button>
+              </div>
+            </div>
+            <div id="muscleMap" class="muscle-map"></div>
+            <div class="calendar-legend">
+              <span><i class="legend-dot empty"></i>fara activitate</span>
+              <span><i class="legend-dot planned"></i>redus</span>
+              <span><i class="legend-dot done"></i>ridicat</span>
+            </div>
+          </section>
+
+          <section class="section-block progress-photos-card">
+            <div class="section-head">
+              <h3>Fotografii progres</h3>
+              <label class="text-button photo-upload">
+                Adauga
+                <input id="progressPhotoInput" type="file" accept="image/*" />
+              </label>
+            </div>
+            <p class="compact-note">Fotografiile tale sunt private.</p>
+            <div class="photo-form-row">
+              <input id="progressPhotoDate" type="date" />
+            </div>
+            <div id="progressPhotos" class="progress-photos"></div>
+          </section>
+        </div>
+
+        <div id="accountView" class="view">
+          <section class="section-block profile-block">
+            <button class="profile-avatar" id="profileInitials" type="button" aria-label="Editeaza profilul">FP</button>
+            <div class="profile-copy">
+              <span id="profileName" class="profile-title">Contul tau</span>
+              <span id="profileEmail" class="muted"></span>
+              <span id="profileMeta" class="profile-meta">Editeaza profilul</span>
+            </div>
+            <button id="logoutButton" class="text-button danger" type="button">Logout</button>
+          </section>
+
+          <section class="section-block plan-block">
+            <div class="section-head">
+              <h3>Planul tau</h3>
+              <span id="currentPlanLabel" class="soft-label">Free</span>
+            </div>
+            <button id="planToggleButton" class="primary-button" type="button">Update la plan</button>
+            <div id="planOptions" class="plan-options hidden">
+              <div class="section-head modal-head">
+                <h3>Alege planul</h3>
+                <button id="closePlanButton" class="icon-button" type="button" aria-label="Inchide planurile">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                </button>
+              </div>
+              <button class="plan-card" data-plan="free" type="button">
+                <strong>Free</strong>
+                <span>0 lei / luna</span>
+                <small>Planificare manuala, hidratare, calendar si progres de baza.</small>
+              </button>
+              <button class="plan-card" data-plan="plus" type="button">
+                <strong>Plus</strong>
+                <span>29 lei / luna</span>
+                <small>Rapoarte PDF, progres extins, recorduri si provocari avansate.</small>
+              </button>
+              <button class="plan-card" data-plan="pro" type="button">
+                <strong>Pro</strong>
+                <span>59 lei / luna</span>
+                <small>Statistici complete, antrenament activ, volum detaliat si urmarire avansata.</small>
+              </button>
+            </div>
+          </section>
+
+          <section id="profileEditor" class="section-block profile-editor hidden">
+            <div class="section-head">
+              <h3>Profilul tau</h3>
+              <span class="soft-label">(poza, kg, obiectiv)</span>
+              <button id="closeProfileButton" class="icon-button" type="button" aria-label="Inchide profilul">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+              </button>
+            </div>
+            <form id="profileForm" class="grid-form profile-form">
+              <label class="avatar-upload">
+                Poza profil
+                <input id="avatarInput" type="file" accept="image/*" />
+                <span>Alege poza</span>
+              </label>
+              <label>
+                Greutate kg
+                <input id="weightInput" type="number" min="20" max="300" step="0.1" placeholder="Ex: 82" />
+              </label>
+              <label>
+                Inaltime cm
+                <input id="heightInput" type="number" min="80" max="240" step="1" placeholder="Ex: 178" />
+              </label>
+              <label>
+                Obiectiv
+                <select id="goalInput">
+                  <option value="">Alege obiectiv</option>
+                  <option value="Masa musculara">Masa musculara</option>
+                  <option value="Definire">Definire</option>
+                  <option value="Slabire">Slabire</option>
+                  <option value="Forta">Forta</option>
+                  <option value="Tonifiere">Tonifiere</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">Salveaza profil</button>
+            </form>
+          </section>
+
+          <section class="section-block account-summary-card">
+            <h3>Abonament sala</h3>
+            <div id="subscriptionStatus" class="subscription-status"></div>
+            <div class="subscription-report">
+              <button id="editSubscriptionButton" class="secondary-button" type="button">Adauga abonament</button>
+              <button id="subscriptionReportButton" class="secondary-button" type="button">Descarca istoric abonament PDF</button>
+              <small id="subscriptionReportMeta">Raportul foloseste data de inceput si data de expirare ale abonamentului.</small>
+            </div>
+          </section>
+
+          <section class="section-block account-summary-card" id="gymSummaryCard">
+            <div class="section-head">
+              <h3>Sala dvs.</h3>
+              <button id="editGymButton" class="text-button" type="button">Adauga sala</button>
+            </div>
+            <div id="gymSummary" class="compact-note">Nu ai adaugat informatii despre sala.</div>
+          </section>
+
+          <section class="section-block legal-card">
+            <div>
+              <h3>Legal si suport</h3>
+              <p class="compact-note">Documente necesare pentru folosirea si publicarea aplicatiei.</p>
+            </div>
+            <div class="legal-actions">
+              <button class="secondary-button" data-legal-doc="privacy" type="button">Privacy Policy</button>
+              <button class="secondary-button" data-legal-doc="terms" type="button">Terms & Conditions</button>
+              <button class="secondary-button" data-legal-doc="support" type="button">Contact suport</button>
+            </div>
+          </section>
+
+          <section class="section-block settings-card">
+            <div>
+              <h3>Setari aplicatie</h3>
+              <p id="settingsSummary" class="settings-summary">Tema intunecata, notificari active.</p>
+            </div>
+            <button id="settingsButton" class="secondary-button" type="button">Setari</button>
+          </section>
+
+          <section class="section-block danger-zone">
+            <div>
+              <h3>Resetare progres</h3>
+              <p>Atentie! Acest buton va sterge progresul de pe cont: antrenamente, hidratare, provocari, recorduri si statisticile generate.</p>
+            </div>
+            <button id="resetProgressButton" class="danger-button" type="button">Resetare progres</button>
+          </section>
+        </div>
+
+        <nav class="tabbar" aria-label="Navigatie principala">
+          <button class="tab active" data-view="homeView" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 4l9 7v9H3z"/><path d="M9 20v-6h6v6"/></svg>
+            Acasa
+          </button>
+          <button class="tab" data-view="trainingView" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v3M17 4v3M4 9h16M5 6h14v14H5z"/></svg>
+            Antrenament
+          </button>
+          <button class="tab" data-view="progressView" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-5 3 3 5-7"/></svg>
+            Progres
+          </button>
+          <button class="tab" data-view="accountView" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.8-4 14.2-4 16 0"/></svg>
+            Cont
+          </button>
+        </nav>
+      </section>
+    </main>
+
+    <div id="modalOverlay" class="modal-overlay hidden" aria-hidden="true"></div>
+    <section id="hydrationModal" class="modal-sheet hidden" aria-modal="true" role="dialog" aria-labelledby="hydrationModalTitle">
+      <div class="section-head modal-head">
+        <h3 id="hydrationModalTitle">Adauga apa</h3>
+        <button id="closeHydrationButton" class="icon-button" type="button" aria-label="Inchide hidratarea">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <form id="hydrationForm" class="grid-form">
+        <label id="hydrationAmountField">
+          Cantitate ml
+          <input id="hydrationInput" type="number" min="1" max="5000" step="50" placeholder="Ex: 300" />
+        </label>
+        <label id="hydrationTargetField">
+          Obiectiv zilnic ml
+          <input id="hydrationTargetInput" type="number" min="500" max="8000" step="100" />
+        </label>
+        <button id="hydrationSubmitButton" class="primary-button" type="submit">Adauga</button>
+        <button id="resetHydrationButton" class="secondary-button" type="button">Reseteaza ziua</button>
+      </form>
+    </section>
+
+    <section id="challengeModal" class="modal-sheet hidden" aria-modal="true" role="dialog" aria-labelledby="challengeModalTitle">
+      <div class="section-head modal-head">
+        <h3 id="challengeModalTitle">Alege provocarea</h3>
+        <button id="closeChallengeButton" class="icon-button" type="button" aria-label="Inchide provocarile">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div id="challengeList" class="challenge-list"></div>
+    </section>
+
+    <section id="achievementsModal" class="modal-sheet hidden" aria-modal="true" role="dialog" aria-labelledby="achievementsModalTitle">
+      <div class="section-head modal-head">
+        <h3 id="achievementsModalTitle">Realizari</h3>
+        <button id="closeAchievementsButton" class="icon-button" type="button" aria-label="Inchide realizarile">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div id="achievementsList" class="achievements-list"></div>
+    </section>
+
+    <section id="muscleModal" class="modal-sheet hidden" aria-modal="true" role="dialog" aria-labelledby="muscleModalTitle">
+      <div class="section-head modal-head">
+        <h3 id="muscleModalTitle">Grupa musculara</h3>
+        <button id="closeMuscleButton" class="icon-button" type="button" aria-label="Inchide grupa musculara">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div id="muscleDetails" class="muscle-details"></div>
+    </section>
+
+    <section id="subscriptionEditor" class="modal-sheet hidden" aria-modal="true" role="dialog" aria-labelledby="subscriptionEditorTitle">
+      <div class="section-head modal-head">
+        <h3 id="subscriptionEditorTitle">Adauga abonament sala</h3>
+        <button id="closeSubscriptionButton" class="icon-button" type="button" aria-label="Inchide abonamentul">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <form id="subscriptionForm" class="grid-form subscription-form">
+        <label>
+          Data inceput
+          <input id="subStartInput" type="date" />
+          <small id="subStartError" class="form-error"></small>
+        </label>
+        <label>
+          Data expirare
+          <input id="subEndInput" type="date" />
+          <small id="subEndError" class="form-error"></small>
+        </label>
+        <label>
+          Tip abonament
+          <input id="subTypeInput" type="text" placeholder="Ex: Lunar" />
+        </label>
+        <label>
+          Pret
+          <input id="subPriceInput" type="number" min="0" step="0.01" placeholder="Ex: 150" />
+          <small id="subPriceError" class="form-error"></small>
+        </label>
+        <label class="wide-field">
+          Observatii
+          <textarea id="subNotesInput" rows="3" placeholder="Optional"></textarea>
+        </label>
+        <button class="primary-button" type="submit">Salveaza</button>
+        <button id="deleteSubscriptionButton" class="secondary-button danger" type="button">Sterge abonamentul</button>
+      </form>
+    </section>
+
+    <section id="gymEditor" class="modal-sheet hidden" aria-modal="true" role="dialog" aria-labelledby="gymEditorTitle">
+      <div class="section-head modal-head">
+        <h3 id="gymEditorTitle">Adauga informatii despre sala</h3>
+        <button id="closeGymButton" class="icon-button" type="button" aria-label="Inchide sala">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <form id="gymForm" class="gym-form">
+        <label>
+          Numele salii
+          <input id="gymNameInput" type="text" placeholder="Ex: Iron House Gym" />
+          <small id="gymNameError" class="form-error"></small>
+        </label>
+        <label>
+          Localitate sau adresa
+          <input id="gymLocationInput" type="text" placeholder="Optional" />
+        </label>
+        <label>
+          Programul salii
+          <input id="gymScheduleInput" type="text" placeholder="Ex: 06:00 - 23:00" />
+        </label>
+        <label>
+          Aparat disponibil
+          <span class="inline-add">
+            <input id="equipmentInput" type="text" placeholder="Ex: presa picioare" />
+            <button id="addEquipmentButton" class="secondary-button" type="button">+</button>
+          </span>
+        </label>
+        <div id="equipmentList" class="equipment-list"></div>
+        <label>
+          Observatii
+          <textarea id="gymNotesInput" rows="3" placeholder="Optional"></textarea>
+        </label>
+        <button class="primary-button" type="submit">Salveaza</button>
+        <button id="deleteGymButton" class="secondary-button danger" type="button">Sterge informatiile despre sala</button>
+      </form>
+    </section>
+
+    <section id="settingsModal" class="modal-sheet settings-modal hidden" aria-modal="true" role="dialog" aria-labelledby="settingsModalTitle">
+      <div class="section-head modal-head">
+        <h3 id="settingsModalTitle">Setari aplicatie</h3>
+        <button id="closeSettingsButton" class="icon-button" type="button" aria-label="Inchide setarile">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <form id="settingsForm" class="settings-form">
+        <fieldset>
+          <legend>Aspect</legend>
+          <div class="theme-options">
+            <label class="theme-option">
+              <input type="radio" name="themeMode" value="dark" />
+              <span>Intunecat</span>
+            </label>
+            <label class="theme-option">
+              <input type="radio" name="themeMode" value="light" />
+              <span>Luminos</span>
+            </label>
+          </div>
+        </fieldset>
+        <label class="setting-row">
+          <span>Notificari aplicatie</span>
+          <input id="notificationsSetting" type="checkbox" />
+        </label>
+        <label class="setting-row">
+          <span>Vibratii la actiuni</span>
+          <input id="vibrationSetting" type="checkbox" />
+        </label>
+        <label class="setting-row">
+          <span>Sunet timer</span>
+          <input id="soundSetting" type="checkbox" />
+        </label>
+        <button class="primary-button" type="submit">Salveaza setarile</button>
+      </form>
+    </section>
+
+    <section id="legalModal" class="modal-sheet legal-modal hidden" aria-modal="true" role="dialog" aria-labelledby="legalModalTitle">
+      <div class="section-head modal-head">
+        <h3 id="legalModalTitle">Legal</h3>
+        <button id="closeLegalButton" class="icon-button" type="button" aria-label="Inchide documentul">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div id="legalModalBody" class="legal-content"></div>
+    </section>
+
+    <section id="deleteWorkoutModal" class="modal-sheet confirm-modal hidden" aria-modal="true" role="dialog" aria-labelledby="deleteWorkoutTitle">
+      <div class="section-head modal-head">
+        <h3 id="deleteWorkoutTitle">Sterge antrenamentul</h3>
+      </div>
+      <p id="deleteWorkoutMessage" class="confirm-message">Vrei sa stergi antrenamentul?</p>
+      <div class="confirm-actions">
+        <button id="cancelDeleteWorkoutButton" class="secondary-button" type="button">Anuleaza</button>
+        <button id="confirmDeleteWorkoutButton" class="secondary-button danger delete-confirm-button" type="button">Sterge</button>
+      </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./app.js?v=64"></script>
+  </body>
+</html>
